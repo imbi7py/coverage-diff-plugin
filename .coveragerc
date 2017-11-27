@@ -1,0 +1,5 @@
+[run]
+plugins = diff_coverage
+
+[diff_coverage]
+diff = /tmp/diff
