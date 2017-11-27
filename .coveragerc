@@ -2,4 +2,4 @@
 plugins = diff_coverage
 
 [diff_coverage]
-diff = /tmp/diff
+diff = sandbox/diff
