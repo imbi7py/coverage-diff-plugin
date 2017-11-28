@@ -21,7 +21,6 @@ class ReportDiff(coverage.python.PythonFileReporter):
     def __init__(self, lineRegistry, filename, *args):
         super(ReportDiff, self).__init__(filename, *args)
         self._lineRegistry = lineRegistry
-        self.filename = filename
         self._linesInDiff = None
 
     def _getLinesInDiff(self):
@@ -51,7 +50,7 @@ class NewLinesInPatchSet(object):
                 for line in hunk:
                     if line.is_added:
                         index.setdefault(
-                            patchedFile.target_file, [],
+                            patchedFile.path, [],
                         ).append(line.target_line_no)
         return index
 
@@ -107,8 +106,8 @@ class NewLinesInPatchSet(object):
             return self._index[suffix]
         return []
 
-class DiffCoveragePlugin(coverage.plugin.CoveragePlugin):
 
+class DiffCoveragePlugin(coverage.plugin.CoveragePlugin):
     def __init__(self, lineRegistry):
         self._lineRegistry = lineRegistry
 
@@ -116,6 +115,10 @@ class DiffCoveragePlugin(coverage.plugin.CoveragePlugin):
     def frompath(cls, path):
         with open(path) as f:
             return cls(NewLinesInPatchSet(unidiff.PatchSet(f)))
+
+    @classmethod
+    def fromStandardIn(cls, stdin):
+        return cls(NewLinesInPatchSet(unidiff.PatchSet(stdin)))
 
     def file_tracer(self, filename):
         if filename.endswith((".py", ".pyc")):
